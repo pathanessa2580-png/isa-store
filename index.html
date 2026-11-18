@@ -64,7 +64,21 @@ function changeQty(id,d){const item=cart.find(x=>x.id===id);if(!item)return;item
 function renderCart(){document.getElementById("cartCount").textContent=cart.reduce((s,x)=>s+x.qty,0);document.getElementById("cartItems").innerHTML=cart.length?cart.map(x=>{const p=products.find(y=>y.id===x.id);return `<div class="cart-row"><img src="${p.image}" alt=""><div><strong>${p.name}</strong><span>${money(p.price)}</span><div class="qty"><button onclick="changeQty(${p.id},-1)">−</button>${x.qty}<button onclick="changeQty(${p.id},1)">+</button></div></div><button class="remove" onclick="changeQty(${p.id},-${x.qty})">Remove</button></div>`}).join(""):'<p>Your cart is empty.</p>';document.getElementById("cartTotal").textContent=money(cart.reduce((s,x)=>s+products.find(p=>p.id===x.id).price*x.qty,0))}
 function openCart(){document.getElementById("cart").classList.add("show");document.getElementById("overlay").classList.add("show")}
 function closeCart(){document.getElementById("cart").classList.remove("show");document.getElementById("overlay").classList.remove("show")}
-function checkout(){if(!cart.length){alert("Your cart is empty.");return}const lines=cart.map(x=>{const p=products.find(y=>y.id===x.id);return `${p.name} x ${x.qty} — ${money(p.price*x.qty)}`});const total=cart.reduce((s,x)=>s+products.find(p=>p.id===x.id).price*x.qty,0);const msg=`Hello ISA Store! I want to place an order:\n\n${lines.join("\n")}\n\nTotal: ${money(total)}\n\nPlease confirm availability and delivery details.`;window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,"_blank")}
+function checkout(){
+ if(!cart.length){alert("Your cart is empty.");return}
+ const customerName=prompt("Please enter your full name:");
+ if(!customerName||!customerName.trim()){alert("Please enter your name.");return}
+ const customerPhone=prompt("Please enter your mobile number:");
+ if(!customerPhone||!customerPhone.trim()){alert("Please enter your mobile number.");return}
+ const customerAddress=prompt("Please enter your full delivery address (house, street, area, city, state):");
+ if(!customerAddress||!customerAddress.trim()){alert("Please enter your delivery address.");return}
+ const customerPincode=prompt("Please enter your 6-digit PIN code:");
+ if(!customerPincode||!/^\\d{6}$/.test(customerPincode.trim())){alert("Please enter a valid 6-digit PIN code.");return}
+ const lines=cart.map(x=>{const p=products.find(y=>y.id===x.id);return `${p.name} x ${x.qty} — ${money(p.price*x.qty)}`});
+ const total=cart.reduce((s,x)=>s+products.find(p=>p.id===x.id).price*x.qty,0);
+ const msg=`Hello ISA Store! I want to place an order.\n\nCUSTOMER DETAILS\nName: ${customerName.trim()}\nMobile: ${customerPhone.trim()}\nDelivery address: ${customerAddress.trim()}\nPIN code: ${customerPincode.trim()}\n\nORDER DETAILS\n${lines.join("\n")}\n\nTotal: ${money(total)}\n\nPlease confirm availability, final amount and delivery details.`;
+ window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,"_blank");
+}
 document.getElementById("search").addEventListener("input",renderProducts);document.getElementById("year").textContent=new Date().getFullYear();renderFilters();renderProducts();renderCart();
 </script>
 </body>
